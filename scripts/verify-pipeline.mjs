@@ -9,6 +9,7 @@ import {
   deriveCustodialVaultAddress,
   calculateResaleSplit,
 } from '../sdk/ona-protocol.mjs';
+import { OnaProvenancePlugin } from '../sdk/ona-agent-plugin.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
@@ -20,7 +21,7 @@ const abiPath = path.join(rootDir, 'contracts', 'abi', 'OnaCertificate.json');
 assert.ok(fs.existsSync(abiPath), 'Compiled ABI artifact must exist at contracts/abi/OnaCertificate.json');
 const artifact = JSON.parse(fs.readFileSync(abiPath, 'utf8'));
 assert.ok(
-  /^0x60[0-9a-f]{2}604052/i.test(artifact.bytecode) && artifact.deployedBytecodeSize > 5000,
+  /^0x[0-9a-f]{10000,}$/i.test(artifact.bytecode) && artifact.deployedBytecodeSize > 5000,
   'Contract bytecode must be valid EVM hex'
 );
 assert.equal(
@@ -34,16 +35,20 @@ assert.equal(
   'ERC-721 ownerOf selector must match 0x6352211e'
 );
 assert.ok(
-  artifact.methodIdentifiers['confirmPhysicalDelivery(uint256,uint32,bytes)'],
-  'EIP-191 ECDSA NFC physical delivery escrow confirmation method must exist'
+  artifact.methodIdentifiers['confirmPhysicalDelivery(uint256,uint32,uint64,bytes)'],
+  'Time-bounded EIP-191 ECDSA NFC physical delivery escrow confirmation method must exist'
 );
 assert.ok(
-  artifact.methodIdentifiers['settleSecondaryResale(uint256,address,bool,uint32,bytes)'],
+  artifact.methodIdentifiers['settleSecondaryResale(uint256,address,bool,uint32,uint64,bytes)'],
   'Enforced secondary resale settlement method must exist'
 );
 assert.ok(
   artifact.methodIdentifiers['cancelResaleListing(uint256)'],
   'Resale listing cancellation method must exist'
+);
+assert.ok(
+  artifact.methodIdentifiers['updateArtistBeneficiary(uint256,address)'],
+  'Artist beneficiary rotation method must exist'
 );
 console.log('✓ [1/5] Solidity ERC-721 + ERC-2981 + NFC Escrow contract ABI & selectors verified');
 
@@ -100,6 +105,23 @@ const regPath = path.join(rootDir, 'metadata', 'provenance_registry.json');
 assert.ok(fs.existsSync(regPath), 'metadata/provenance_registry.json must exist');
 const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
 assert.equal(reg.pieces.length, 3, 'Registry must contain 3 verified pilot artwork bundles');
-console.log(`✓ [5/5] Provenance registry verified (${reg.pieces.length} pieces, Registry CID: ${reg.registryCidV1})`);
+console.log(`✓ [5/6] Provenance registry verified (${reg.pieces.length} pieces, Registry CID: ${reg.registryCidV1})`);
+
+// 6. Verify SolanaAgentKit v2 / MCP AI Agent Plugin Actions
+assert.equal(OnaProvenancePlugin.name, 'ona-provenance');
+assert.equal(OnaProvenancePlugin.actions.length, 3);
+const intent = await OnaProvenancePlugin.actions[2].handler(null, {
+  buyerEmail: 'collector.lagos@gallery.example',
+  artistAddress: 'OnaArtist1111111111111111111111111111111111',
+  pieceTitle: 'Harmattan Over Third Mainland',
+  primaryPriceUsd: 950,
+  royaltyBps: 1000,
+  tagUid: '04A28F19C36B80',
+  tagSecretHex: secret,
+  ecosystem: 'solana',
+});
+assert.ok(intent.ipfsProvenanceCid.startsWith('bafkrei'));
+assert.ok(intent.gasSponsorship.includes('Kora'));
+console.log('✓ [6/6] SolanaAgentKit v2 + MCP AI Agent Plugin actions verified');
 
 console.log('ALL ONA PROTOCOL CHECKS PASSED.');

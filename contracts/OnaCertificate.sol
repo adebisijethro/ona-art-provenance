@@ -16,14 +16,14 @@ interface IERC721Receiver {
     ) external returns (bytes4);
 }
 
-/// @title OnaCertificate (v0.3 — Security-Audited Release)
+/// @title OnaCertificate (v0.4 — Multi-Chain & AI-Agent Hardened Release)
 /// @author Jethro Adebisi (BlockPrint / Ona Protocol)
 /// @notice Open-source physical-to-digital art provenance certificate (ERC-721 + ERC-2981) with:
-///         - EIP-191 ECDSA Secure Unique NFC (NTAG 424 DNA SUN) signature verification & replay defense
-///         - Primary sale delivery escrow released upon verified physical NFC tap
+///         - Time-bounded EIP-191 ECDSA Secure Unique NFC (NTAG 424 DNA SUN) signature verification
+///         - Primary sale delivery escrow gate (blocks transfer/resale while delivery escrow is pending)
 ///         - Strict self-custody sovereignty (relayer/admin locked out once exported or direct-minted)
-///         - Atomic secondary resale settlement enforcing ERC-2981 artist royalties (native + SafeERC20)
-///         - Reentrancy protection (nonReentrant + Checks-Effects-Interactions) & native overpayment refunds
+///         - Artist beneficiary wallet rotation (`updateArtistBeneficiary`) & two-step admin rotation
+///         - Atomic secondary resale settlement enforcing ERC-2981 royalties (native + SafeERC20)
 contract OnaCertificate is IERC165 {
     // -------------------------------------------------------------------------
     // Errors
@@ -39,6 +39,8 @@ contract OnaCertificate is IERC165 {
     error NoPhysicalTagBound();
     error InvalidNFCCounter();
     error InvalidNFCSignature();
+    error SignatureExpired();
+    error DeliveryEscrowPending();
     error AlreadySelfCustodied();
     error NotListedForResale();
     error SelfPurchaseDisallowed();
@@ -59,17 +61,17 @@ contract OnaCertificate is IERC165 {
     // Structs
     // -------------------------------------------------------------------------
     struct MintParams {
-        address artist;              // Original creator & perpetual ERC-2981 beneficiary
-        address buyerRecipient;      // Email custodial vault or collector wallet
-        uint96 royaltyBps;           // Secondary resale royalty in basis points (0..2500)
-        bytes32 tagHardwareHash;     // keccak256(nfcTagUid, hardwareSalt) — bytes32(0) if digital-only
-        uint16 editionIndex;         // 1-based edition number
-        uint16 editionTotal;         // Total edition size (>= editionIndex)
-        bool isCustodialVault;       // True only for email-abstracted custodial vaults
-        string ipfsProvenanceCID;    // Filecoin/IPFS CIDv1 multihash (bafkrei...)
-        address escrowToken;         // address(0) for native ETH/CELO, or ERC-20 (USDC / cUSD)
-        uint256 escrowAmount;        // Escrowed amount held until physical NFC delivery tap
-        uint256 recordedPrimaryPrice;// Full primary sale price recorded in provenance history
+        address artist;
+        address buyerRecipient;
+        uint96 royaltyBps;
+        bytes32 tagHardwareHash;
+        uint16 editionIndex;
+        uint16 editionTotal;
+        bool isCustodialVault;
+        string ipfsProvenanceCID;
+        address escrowToken;
+        uint256 escrowAmount;
+        uint256 recordedPrimaryPrice;
     }
 
     struct ArtworkRecord {
@@ -115,6 +117,7 @@ contract OnaCertificate is IERC165 {
     string public symbol = "ONA-COA";
 
     address public admin;
+    address public pendingAdmin;
     address public custodialRelayer;
     address public nfcSunVerifier;
     address public protocolTreasury;
@@ -182,6 +185,15 @@ contract OnaCertificate is IERC165 {
         address indexed externalWallet
     );
 
+    event ArtistBeneficiaryUpdated(
+        uint256 indexed tokenId,
+        address indexed previousArtist,
+        address indexed newArtist
+    );
+
+    event AdminTransferInitiated(address indexed currentAdmin, address indexed pendingAdmin);
+    event AdminTransferCompleted(address indexed previousAdmin, address indexed newAdmin);
+
     event ProtocolConfigUpdated(
         address indexed custodialRelayer,
         address indexed nfcSunVerifier,
@@ -238,7 +250,6 @@ contract OnaCertificate is IERC165 {
             interfaceId == 0x2a55205a;   // IERC2981
     }
 
-    /// @notice ERC-2981 standard royalty lookup honoured by compliant marketplaces and Ona's resale engine
     function royaltyInfo(uint256 tokenId, uint256 salePrice)
         public
         view
@@ -274,12 +285,13 @@ contract OnaCertificate is IERC165 {
         return _provenanceHistory[tokenId];
     }
 
-    /// @notice Computes the inner digest signed by `nfcSunVerifier` (with EIP-191 personal_sign prefix)
+    /// @notice Computes the time-bounded inner digest signed by `nfcSunVerifier` (EIP-191)
     function computeNfcTapDigest(
         uint256 tokenId,
         bytes32 tagHardwareHash,
         uint32 tapCounter,
-        address actor
+        address actor,
+        uint64 signatureDeadline
     ) public view returns (bytes32) {
         return
             keccak256(
@@ -289,7 +301,8 @@ contract OnaCertificate is IERC165 {
                     tokenId,
                     tagHardwareHash,
                     tapCounter,
-                    actor
+                    actor,
+                    signatureDeadline
                 )
             );
     }
@@ -378,7 +391,6 @@ contract OnaCertificate is IERC165 {
             p.ipfsProvenanceCID
         );
 
-        // Interactions last (CEI)
         if (p.escrowAmount > 0 && p.escrowToken != address(0)) {
             _safeTransferFrom(p.escrowToken, msg.sender, address(this), p.escrowAmount);
         }
@@ -390,12 +402,14 @@ contract OnaCertificate is IERC165 {
     // -------------------------------------------------------------------------
     // 2. Physical NFC Tag Tap Verification & Primary Escrow Release
     // -------------------------------------------------------------------------
-    /// @notice Verifies EIP-191 signed NTAG 424 DNA SUN tap + monotonic counter and releases escrow
     function confirmPhysicalDelivery(
         uint256 tokenId,
         uint32 tapCounter,
+        uint64 signatureDeadline,
         bytes calldata sunSignature
     ) external nonReentrant {
+        if (block.timestamp > signatureDeadline) revert SignatureExpired();
+
         address currentOwner = ownerOf(tokenId);
         ArtworkRecord storage art = artworks[tokenId];
 
@@ -406,9 +420,15 @@ contract OnaCertificate is IERC165 {
         if (art.tagHardwareHash == bytes32(0)) revert NoPhysicalTagBound();
         if (tapCounter <= art.lastTapCounter) revert InvalidNFCCounter();
 
-        _verifyNfcSunSignature(tokenId, art.tagHardwareHash, tapCounter, currentOwner, sunSignature);
+        _verifyNfcSunSignature(
+            tokenId,
+            art.tagHardwareHash,
+            tapCounter,
+            currentOwner,
+            signatureDeadline,
+            sunSignature
+        );
 
-        // Effects before Interactions
         art.lastTapCounter = tapCounter;
         art.physicalVerified = true;
 
@@ -448,6 +468,7 @@ contract OnaCertificate is IERC165 {
         address paymentToken,
         uint256 askPrice
     ) external {
+        _requireEscrowSettled(tokenId);
         address owner = ownerOf(tokenId);
         ArtworkRecord storage art = artworks[tokenId];
 
@@ -484,6 +505,7 @@ contract OnaCertificate is IERC165 {
         address newCollector,
         bool newCollectorIsCustodial,
         uint32 nfcTapCounter,
+        uint64 signatureDeadline,
         bytes calldata sunSignature
     ) external payable nonReentrant {
         ResaleListing memory listing = resaleListings[tokenId];
@@ -506,9 +528,17 @@ contract OnaCertificate is IERC165 {
 
         ArtworkRecord storage art = artworks[tokenId];
         if (nfcTapCounter > 0) {
+            if (block.timestamp > signatureDeadline) revert SignatureExpired();
             if (art.tagHardwareHash == bytes32(0)) revert NoPhysicalTagBound();
             if (nfcTapCounter <= art.lastTapCounter) revert InvalidNFCCounter();
-            _verifyNfcSunSignature(tokenId, art.tagHardwareHash, nfcTapCounter, newCollector, sunSignature);
+            _verifyNfcSunSignature(
+                tokenId,
+                art.tagHardwareHash,
+                nfcTapCounter,
+                newCollector,
+                signatureDeadline,
+                sunSignature
+            );
             art.lastTapCounter = nfcTapCounter;
         }
 
@@ -516,7 +546,6 @@ contract OnaCertificate is IERC165 {
         uint256 feeAmount = (gross * protocolFeeBps) / BPS_DENOMINATOR;
         uint256 sellerNet = gross - artistRoyalty - feeAmount;
 
-        // Effects BEFORE Interactions (strict CEI)
         delete resaleListings[tokenId];
         art.custodialHeld = newCollectorIsCustodial;
         _transfer(listing.seller, newCollector, tokenId);
@@ -543,7 +572,6 @@ contract OnaCertificate is IERC165 {
             feeAmount
         );
 
-        // Interactions
         if (listing.paymentToken == address(0)) {
             _payout(address(0), art.artist, artistRoyalty);
             _payout(address(0), protocolTreasury, feeAmount);
@@ -565,10 +593,12 @@ contract OnaCertificate is IERC165 {
     }
 
     // -------------------------------------------------------------------------
-    // 4. Self-Custody Wallet Export (Strict One-Way Lockout of Custodial Relayer)
+    // 4. Self-Custody Export & Artist Royalty Beneficiary Rotation
     // -------------------------------------------------------------------------
     function exportToSelfCustody(uint256 tokenId, address externalWallet) external onlyRelayerOrAdmin {
         if (externalWallet == address(0)) revert InvalidAddress();
+        _requireEscrowSettled(tokenId);
+
         address vault = ownerOf(tokenId);
         ArtworkRecord storage art = artworks[tokenId];
         if (!art.custodialHeld) revert AlreadySelfCustodied();
@@ -590,6 +620,18 @@ contract OnaCertificate is IERC165 {
         );
 
         emit SelfCustodyExported(tokenId, vault, externalWallet);
+    }
+
+    /// @notice Allows ONLY the original artist to rotate their ERC-2981 royalty payout address
+    function updateArtistBeneficiary(uint256 tokenId, address newArtist) external {
+        if (_owners[tokenId] == address(0)) revert NonexistentToken();
+        if (newArtist == address(0)) revert InvalidAddress();
+        ArtworkRecord storage art = artworks[tokenId];
+        if (msg.sender != art.artist) revert Unauthorized();
+
+        address previous = art.artist;
+        art.artist = newArtist;
+        emit ArtistBeneficiaryUpdated(tokenId, previous, newArtist);
     }
 
     // -------------------------------------------------------------------------
@@ -619,6 +661,7 @@ contract OnaCertificate is IERC165 {
     }
 
     function transferFrom(address from, address to, uint256 tokenId) public {
+        _requireEscrowSettled(tokenId);
         if (!_isApprovedOrOwner(msg.sender, tokenId)) revert Unauthorized();
         artworks[tokenId].custodialHeld = false;
         _transfer(from, to, tokenId);
@@ -637,8 +680,22 @@ contract OnaCertificate is IERC165 {
     }
 
     // -------------------------------------------------------------------------
-    // Admin Configuration
+    // Two-Step Admin & Protocol Configuration
     // -------------------------------------------------------------------------
+    function transferAdmin(address _pendingAdmin) external onlyAdmin {
+        if (_pendingAdmin == address(0)) revert InvalidAddress();
+        pendingAdmin = _pendingAdmin;
+        emit AdminTransferInitiated(admin, _pendingAdmin);
+    }
+
+    function acceptAdmin() external {
+        if (msg.sender != pendingAdmin) revert Unauthorized();
+        address prev = admin;
+        admin = pendingAdmin;
+        pendingAdmin = address(0);
+        emit AdminTransferCompleted(prev, admin);
+    }
+
     function updateProvenanceCID(uint256 tokenId, string calldata newCid) external onlyRelayerOrAdmin {
         if (_owners[tokenId] == address(0)) revert NonexistentToken();
         artworks[tokenId].ipfsProvenanceCID = newCid;
@@ -675,15 +732,27 @@ contract OnaCertificate is IERC165 {
     // -------------------------------------------------------------------------
     // Internal Cryptographic & SafeERC20 Helpers
     // -------------------------------------------------------------------------
+    function _requireEscrowSettled(uint256 tokenId) internal view {
+        PrimaryEscrow storage esc = escrows[tokenId];
+        if (esc.amount > 0 && !esc.released) revert DeliveryEscrowPending();
+    }
+
     function _verifyNfcSunSignature(
         uint256 tokenId,
         bytes32 tagHardwareHash,
         uint32 tapCounter,
         address actor,
+        uint64 signatureDeadline,
         bytes calldata sig
     ) internal view {
         if (sig.length != 65) revert InvalidNFCSignature();
-        bytes32 digest = computeNfcTapDigest(tokenId, tagHardwareHash, tapCounter, actor);
+        bytes32 digest = computeNfcTapDigest(
+            tokenId,
+            tagHardwareHash,
+            tapCounter,
+            actor,
+            signatureDeadline
+        );
         bytes32 ethSignedHash = keccak256(
             abi.encodePacked("\x19Ethereum Signed Message:\n32", digest)
         );
@@ -739,7 +808,7 @@ contract OnaCertificate is IERC165 {
 
     function _safeTransfer(address token, address to, uint256 amount) internal {
         (bool ok, bytes memory data) = token.call(
-            abi.encodeWithSelector(0xa9059cbb, to, amount) // transfer(address,uint256)
+            abi.encodeWithSelector(0xa9059cbb, to, amount)
         );
         if (!ok || (data.length > 0 && !abi.decode(data, (bool)))) {
             revert TransferFailed();
@@ -748,7 +817,7 @@ contract OnaCertificate is IERC165 {
 
     function _safeTransferFrom(address token, address from, address to, uint256 amount) internal {
         (bool ok, bytes memory data) = token.call(
-            abi.encodeWithSelector(0x23b872dd, from, to, amount) // transferFrom(address,address,uint256)
+            abi.encodeWithSelector(0x23b872dd, from, to, amount)
         );
         if (!ok || (data.length > 0 && !abi.decode(data, (bool)))) {
             revert TransferFailed();

@@ -25,8 +25,11 @@
 
 | Path | Description |
 | :--- | :--- |
-| [`contracts/OnaCertificate.sol`](contracts/OnaCertificate.sol) | Audited Solidity (`^0.8.20`) smart contract (`v0.3`) implementing `ERC-721`, `ERC-2981`, EIP-191 ECDSA NTAG 424 DNA SUN signature verification, strict self-custody lockout, `nonReentrant` + CEI protection, native overpayment refunds, and `SafeERC20` secondary resale splits. |
-| [`contracts/abi/OnaCertificate.json`](contracts/abi/OnaCertificate.json) | Compiled ABI, EVM bytecode (`15,507 bytes` runtime), and ERC-165/721/2981 method selectors (`solc 0.8.26`). |
+| [`contracts/OnaCertificate.sol`](contracts/OnaCertificate.sol) | Audited Solidity (`^0.8.20`) smart contract (`v0.4`) implementing `ERC-721`, `ERC-2981`, time-bounded EIP-191 ECDSA NTAG 424 DNA SUN verification (`SignatureExpired`), premature-transfer lock (`DeliveryEscrowPending`), strict self-custody lockout, artist wallet rotation (`updateArtistBeneficiary`), two-step admin transfer, `nonReentrant` + CEI, and `SafeERC20` resale splits. |
+| [`programs/ona_provenance/src/lib.rs`](programs/ona_provenance/src/lib.rs) | Solana **Anchor** Rust smart contract (`v0.4`) verified with **0 issues** by Solana Developer MCP's `program_autofixer`: PDA certificates, SPL/Token-2022 `transfer_checked` USDC escrow vault, NTAG 424 DNA SUN co-signer + deadline checks, atomic 3-way resale split, and one-way self-custody lockout. |
+| [`kora/kora.toml`](kora/kora.toml) | Production-hardened **Solana Foundation Kora** gasless paymaster policy sponsoring collector fees with locked `[validation.fee_payer_policy.system]`. |
+| [`sdk/ona-agent-plugin.mjs`](sdk/ona-agent-plugin.mjs) | **Solana Agent Kit v2** (`@solana-agent-kit`) + Vercel AI SDK + MCP plugin exposing `ONA_VERIFY_ARTWORK_NFC_TAP`, `ONA_QUOTE_RESALE_ROYALTIES`, and `ONA_PREPARE_CUSTODIAL_CHECKOUT`. |
+| [`contracts/abi/OnaCertificate.json`](contracts/abi/OnaCertificate.json) | Compiled ABI, EVM bytecode, and ERC-165/721/2981 method selectors (`solc 0.8.26`). |
 | [`contracts/mocks/TestContracts.sol`](contracts/mocks/TestContracts.sol) | Testnet fork & security harnesses: `MockERC20` (`USDC`), `MockNonStandardERC20` (legacy zero-return `USDT`), `MaliciousReentrantParticipant`, and `ERC721Receiver` mocks. |
 | [`contracts/SPECIFICATION.md`](contracts/SPECIFICATION.md) | Technical specification: end-to-end sequence flows, EIP-191 NTAG 424 DNA SUN cryptographic model, and multi-chain standard mapping. |
 | [`sdk/ona-protocol.mjs`](sdk/ona-protocol.mjs) | Zero-dependency ES module SDK for RFC 4648 CIDv1 computation, NTAG 424 DNA SUN tap signing/verification, email custodial vault derivation, and ERC-2981 split calculation. |

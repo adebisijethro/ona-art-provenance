@@ -99,6 +99,7 @@ contract MaliciousReentrantParticipant {
                 address(this),
                 false,
                 0,
+                0,
                 ""
             ) {
                 reentryBlockedAsExpected = false;

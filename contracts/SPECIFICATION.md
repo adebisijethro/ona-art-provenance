@@ -72,9 +72,19 @@ While the primary reference deployment targets **Base (`8453` / `84532`)** and *
 
 | Ecosystem | Certificate Standard | Royalty Standard | Settlement Rail |
 | :--- | :--- | :--- | :--- |
-| **Base L2** | `ERC-721` | `ERC-2981` + `settleSecondaryResale` | Card (Stripe/Paystack) + `USDC` |
-| **Celo / MiniPay** | `ERC-721` | `ERC-2981` + `settleSecondaryResale` | Opera MiniPay `cUSD` + Mobile Tap |
+| **Base L2** | `ERC-721` (`OnaCertificate.sol` v0.4) | `ERC-2981` + `settleSecondaryResale` | Card (Stripe/Paystack) + `USDC` |
+| **Celo / MiniPay** | `ERC-721` (`OnaCertificate.sol` v0.4) | `ERC-2981` + `settleSecondaryResale` | Opera MiniPay `cUSD` + Mobile Tap |
+| **Solana** | `ona_provenance` Anchor PDA + **Metaplex Core** | Enforced Core `Royalties` plugin + Anchor `settle_secondary_resale` (`SPL`/`Token-2022`) | **Kora** Gasless Paymaster + **Solana Keychain** KMS + `USDC` |
 | **Filecoin / IPFS** | `CIDv1` (`raw` / `sha2-256`) | Embedded in Provenance Envelope | Permanent content-addressed archival |
 | **Tezos** | `FA2` (`TZIP-12`) | `TZIP-21` Royalties Metadata | `tez` / `USDt` |
 | **Cardano** | Native Asset (`CIP-68`) | `CIP-27` Royalty Token | `ADA` / `USDM` |
 | **Flow** | Cadence `NonFungibleToken` | `MetadataViews.Royalties` | Dapper / Fiat Card |
+
+---
+
+## 6. AI Agent & Concierge Layer (`sdk/ona-agent-plugin.mjs`)
+
+Ona ships an open-source AI agent plugin (`OnaProvenancePlugin`) following the **Solana Agent Kit v2** plugin interface (`{ name, methods, actions, initialize }`) as well as MCP / Vercel AI SDK tool schemas:
+* `ONA_VERIFY_ARTWORK_NFC_TAP`: Validates NTAG 424 DNA rolling counters and `SUN` MACs, blocking copied QR/URL replays.
+* `ONA_QUOTE_RESALE_ROYALTIES`: Computes deterministic artist, collector, and protocol splits before signing.
+* `ONA_PREPARE_CUSTODIAL_CHECKOUT`: Derives collector custodial vaults, computes Filecoin CIDv1 hashes, and prepares Kora/ERC-4337 gasless escrow intents.

@@ -1,0 +1,43 @@
+# Ona Gasless Paymaster Configuration (Solana Foundation Kora)
+# Follows solana-foundation/solana-dev-skill references/kora.md security checklist:
+# - Sponsors transaction fees so card/USDC art collectors transact with zero SOL.
+# - Locks fee_payer_policy.system so untrusted transactions can never drain fee-payer SOL.
+# - Backed in production by Solana Keychain (AWS KMS / Turnkey) rather than raw keypair files.
+
+[kora]
+rate_limit = 60
+
+[validation]
+max_allowed_lamports = 250000
+max_signatures = 4
+price_source = "Jupiter"
+
+allowed_programs = [
+  "OnaPrv1111111111111111111111111111111111111", # Ona Provenance Anchor Program
+  "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d", # Metaplex Core (enforced Royalties plugin)
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",  # SPL Token
+  "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",  # SPL Token-2022 (Transfer Hooks)
+  "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL", # Associated Token Account
+  "ComputeBudget111111111111111111111111111111"   # Compute Budget
+]
+
+allowed_tokens = [
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # Mainnet USDC
+]
+
+allowed_spl_paid_tokens = [
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # Collectors/Relayers settle gas in USDC
+]
+
+disallowed_accounts = []
+
+[validation.price]
+type = "free"
+
+[validation.fee_payer_policy.system]
+allow_transfer = false
+allow_create_account = false
+allow_allocate = false
+
+[validation.fee_payer_policy.system.nonce]
+allow_withdraw = false

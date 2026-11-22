@@ -38,6 +38,7 @@ const input = {
     'TestContracts.sol': { content: testMocksSource },
   },
   settings: {
+    viaIR: true,
     optimizer: { enabled: true, runs: 200 },
     evmVersion: 'paris',
     outputSelection: {
@@ -66,7 +67,7 @@ fs.mkdirSync(outDir, { recursive: true });
 const target = compiled.contracts['OnaCertificate.sol']['OnaCertificate'];
 const artifact = {
   contractName: 'OnaCertificate',
-  version: '0.3.0',
+  version: '0.4.0',
   compilerVersion: solc.version(),
   standards: ['ERC-165', 'ERC-721', 'ERC-721Metadata', 'ERC-2981', 'EIP-191-NFC-SUN'],
   supportedChains: [
@@ -108,5 +109,5 @@ fs.writeFileSync(
 );
 
 console.log(
-  `Compiled OnaCertificate.sol v0.3 + 5 test harnesses cleanly with solc ${solc.version()} (${artifact.deployedBytecodeSize} bytes runtime bytecode, 0 errors)`
+  `Compiled OnaCertificate.sol v0.4 + 5 test harnesses cleanly with solc ${solc.version()} (${artifact.deployedBytecodeSize} bytes runtime bytecode, 0 errors)`
 );

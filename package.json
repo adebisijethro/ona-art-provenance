@@ -1,7 +1,7 @@
 {
   "name": "ona-art-provenance",
-  "version": "0.3.0",
-  "description": "Open-source physical-to-digital art provenance protocol, ERC-721 + ERC-2981 + NTAG 424 DNA NFC certificate engine, walletless card/MiniPay checkout, and Filecoin/IPFS CIDv1 archival.",
+  "version": "0.4.0",
+  "description": "Open-source physical-to-digital art provenance protocol: EVM (ERC-721/2981) + Solana Anchor + Kora gasless paymaster + SolanaAgentKit v2 AI plugin + NTAG 424 DNA NFC + Filecoin CIDv1.",
   "type": "module",
   "license": "MIT",
   "author": "Jethro Adebisi <adebisireuel@gmail.com> (https://jethrotheuxpert.vercel.app/)",
@@ -13,7 +13,8 @@
   "scripts": {
     "compile": "node scripts/compile-contracts.mjs",
     "bundle:ipfs": "node scripts/generate-provenance-bundles.mjs",
-    "test": "node scripts/verify-pipeline.mjs && node scripts/test-evm-and-testnet.mjs",
+    "audit:solana": "node scripts/audit-solana-mcp.mjs",
+    "test": "node scripts/verify-pipeline.mjs && node scripts/audit-solana-mcp.mjs && node scripts/test-evm-and-testnet.mjs",
     "test:testnet": "node scripts/test-evm-and-testnet.mjs",
     "deploy:base-sepolia": "node scripts/deploy-testnet.mjs base-sepolia",
     "deploy:celo-sepolia": "node scripts/deploy-testnet.mjs celo-sepolia"
