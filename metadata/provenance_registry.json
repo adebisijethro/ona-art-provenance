@@ -1,0 +1,64 @@
+{
+  "protocol": "Ona: Physical Art Provenance & NFC Certificate Engine",
+  "version": "0.2.0",
+  "generatedAt": "2026-11-22T16:00:00Z",
+  "standards": [
+    "ERC-721",
+    "ERC-2981",
+    "NTAG-424-DNA-SUN",
+    "IPFS-CIDv1-SHA256"
+  ],
+  "ecosystems": [
+    "Base (8453)",
+    "Celo / MiniPay (42220)",
+    "Filecoin / IPFS"
+  ],
+  "pieces": [
+    {
+      "pieceId": "ona_piece_001",
+      "tokenId": 1,
+      "title": "Harmattan Over Third Mainland",
+      "artist": "Adaeze Nwosu",
+      "studio": "Yaba, Lagos, Nigeria",
+      "edition": "1/1",
+      "royaltyBps": 1000,
+      "primaryPriceUsd": 950,
+      "nfcTagUid": "04A28F19C36B80",
+      "tagHardwareHash": "0x49741b4605b667346eca2b49e202a7247f4d248e32aac7b3724003950b17c73e",
+      "cidV1": "bafkreiclojvhtcwdpezwmszqy2c4epo2pgkgedtu4beigsh4lqsxcoofnm",
+      "ipfsUri": "ipfs://bafkreiclojvhtcwdpezwmszqy2c4epo2pgkgedtu4beigsh4lqsxcoofnm",
+      "metadataFile": "metadata/ona_piece_001.json"
+    },
+    {
+      "pieceId": "ona_piece_002",
+      "tokenId": 2,
+      "title": "Nok Terracotta Meridian II",
+      "artist": "Tunde Ogunlesi",
+      "studio": "Abeokuta & Victoria Island, Nigeria",
+      "edition": "1/3",
+      "royaltyBps": 1200,
+      "primaryPriceUsd": 1450,
+      "nfcTagUid": "04E75102BA9480",
+      "tagHardwareHash": "0xe6080617fd012b8dba509bdbd436db33bdcdfaf33c939460f6e84a9b06a948ba",
+      "cidV1": "bafkreid46csbdmyeuveqx43bpdunzmsxo2my7c2zppm7ztl2fahfkwmkzi",
+      "ipfsUri": "ipfs://bafkreid46csbdmyeuveqx43bpdunzmsxo2my7c2zppm7ztl2fahfkwmkzi",
+      "metadataFile": "metadata/ona_piece_002.json"
+    },
+    {
+      "pieceId": "ona_piece_003",
+      "tokenId": 3,
+      "title": "Marina Dusk Monoprint (Study IV)",
+      "artist": "Kofi Boateng",
+      "studio": "Osu, Accra, Ghana",
+      "edition": "2/5",
+      "royaltyBps": 1000,
+      "primaryPriceUsd": 620,
+      "nfcTagUid": "0419C4887D2E80",
+      "tagHardwareHash": "0xb39a20477f1071ed6015878da3723bc7b7bc448fe10df3384e4261841eca0300",
+      "cidV1": "bafkreihcoimguk2igivoux2eiypoonwhzfyswtcom62u5duldiysncrafi",
+      "ipfsUri": "ipfs://bafkreihcoimguk2igivoux2eiypoonwhzfyswtcom62u5duldiysncrafi",
+      "metadataFile": "metadata/ona_piece_003.json"
+    }
+  ],
+  "registryCidV1": "bafkreidcd6a2iukbmptj7p3ickueucq4xbixsp4lsqy3m67byapjv2mk6y"
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "https://ona.blockprint.team/schemas/provenance-certificate-v1.json",
+  "name": "Marina Dusk Monoprint (Study IV) — Ona Certificate #3",
+  "description": "Tamper-evident physical-to-digital certificate of authenticity for \"Marina Dusk Monoprint (Study IV)\" (2026) by Kofi Boateng. Enforces 10.0% ERC-2981 secondary resale royalties across Base L2 and Celo MiniPay.",
+  "image": "assets/artworks/marina-monoprint.jpg",
+  "external_url": "https://adebisijethro.github.io/ona-art-provenance/?uid=0419C4887D2E80&ctr=000015&mac=CD79DC246BF97951",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Kofi Boateng"
+    },
+    {
+      "trait_type": "Origin Studio",
+      "value": "Osu, Accra, Ghana"
+    },
+    {
+      "trait_type": "Medium",
+      "value": "Archival copperplate etching & hand-pulled carbon ink on 310gsm cotton rag"
+    },
+    {
+      "trait_type": "Dimensions",
+      "value": "85 × 65 cm"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "2 of 5"
+    },
+    {
+      "trait_type": "ERC-2981 Creator Royalty",
+      "value": "10.0%"
+    },
+    {
+      "trait_type": "NFC Hardware Chip",
+      "value": "NXP NTAG 424 DNA TamperTag"
+    },
+    {
+      "trait_type": "NFC Tag UID",
+      "value": "0419C4887D2E80"
+    }
+  ],
+  "provenance": {
+    "tokenId": 3,
+    "chainsSupported": [
+      "eip155:8453 (Base)",
+      "eip155:42220 (Celo MiniPay)"
+    ],
+    "artistRoyaltyReceiver": "0x9E04D2183A76c50B11F80429D3a6E7128C405F63",
+    "royaltyBps": 1000,
+    "custodialBuyerVault": "0x2c12a89719e730edbdf0ea377667a9637bb2e93c",
+    "tagHardwareHash": "0xb39a20477f1071ed6015878da3723bc7b7bc448fe10df3384e4261841eca0300",
+    "lastVerifiedTapCounter": 21,
+    "primarySalePricing": {
+      "usdStripe": 620,
+      "ngnPaystack": 992000,
+      "usdcBase": 620,
+      "cusdMiniPay": 620
+    },
+    "secondaryResaleSimulation": {
+      "grossSalePrice": 1950,
+      "royaltyBps": 1000,
+      "protocolFeeBps": 500,
+      "artistRoyalty": 195,
+      "protocolFee": 97.5,
+      "sellerProceeds": 1657.5
+    },
+    "checkpoints": [
+      {
+        "event": "ARTIST_STUDIO_REGISTRATION",
+        "actor": "0x9E04D2183A76c50B11F80429D3a6E7128C405F63",
+        "timestamp": "2026-11-18T10:00:00Z"
+      },
+      {
+        "event": "CARD_CUSTODIAL_MINT_AND_ESCROW",
+        "actor": "0x2c12a89719e730edbdf0ea377667a9637bb2e93c",
+        "amountUsd": 620,
+        "timestamp": "2026-11-20T14:30:00Z"
+      },
+      {
+        "event": "NFC_DELIVERY_TAP_VERIFIED",
+        "actor": "0x2c12a89719e730edbdf0ea377667a9637bb2e93c",
+        "nfcCounter": 21,
+        "sunMac": "CD79DC246BF97951",
+        "timestamp": "2026-11-22T11:15:00Z"
+      }
+    ]
+  },
+  "archival": {
+    "network": "Filecoin / IPFS Content-Addressed Bundle",
+    "cidV1": "bafkreihcoimguk2igivoux2eiypoonwhzfyswtcom62u5duldiysncrafi",
+    "ipfsUri": "ipfs://bafkreihcoimguk2igivoux2eiypoonwhzfyswtcom62u5duldiysncrafi",
+    "sha256Digest": "0xe272186a2b48322aea5f44461ee736c7c9712b4c4e67b54e8e8b1a31268a202a",
+    "byteLength": 2698
+  }
+}

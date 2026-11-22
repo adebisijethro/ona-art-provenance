@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ona — Physical Art Provenance, Walletless Checkout &amp; NFC Certificate Engine</title>
+    <meta
+      name="description"
+      content="Open-source physical-to-digital art provenance protocol. Collectors pay by card or Celo MiniPay without seed phrases; physical works carry tamper-evident NTAG 424 DNA NFC seals paired to Base ERC-721 + ERC-2981 certificates and Filecoin CIDv1 archival."
+    />
+    <meta property="og:title" content="Ona — Physical Art Provenance &amp; NFC Certificate Engine" />
+    <meta
+      property="og:description"
+      content="Tamper-evident NFC art authentication, walletless fiat/MiniPay checkout, and enforced ERC-2981 artist resale royalties on Base, Celo &amp; Filecoin."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="assets/artworks/harmattan-linen.jpg" />
+    <meta name="theme-color" content="#f6f2ea" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to provenance workbench</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand-mark" href="#top" aria-label="Ona Provenance Protocol home">
+          <span class="brand-seal" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.5"></circle>
+              <path d="M8.5 12a3.5 3.5 0 0 1 7 0"></path>
+              <circle cx="12" cy="12" r="1.4" fill="currentColor"></circle>
+            </svg>
+          </span>
+          <span class="brand-title">Ona</span>
+          <span class="brand-sub">Physical Art Provenance &amp; NFC Engine</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Primary sections">
+          <a class="nav-link" href="#catalogue-workbench">Catalogue &amp; Checkout</a>
+          <a class="nav-link" href="#nfc-verifier">NFC Seal Verifier</a>
+          <a class="nav-link" href="#resale-engine">Resale Royalties</a>
+          <a class="nav-link" href="#artist-studio">Artist Studio</a>
+          <a
+            class="btn btn-secondary"
+            href="https://github.com/adebisijethro/ona-art-provenance"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+              <path d="M9 18c-4.51 2-5-2-7-2"></path>
+            </svg>
+            Source &amp; Contracts
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero" id="top">
+        <div class="wrap hero-grid">
+          <div>
+            <h1>Physical art collectors buy by card, paired with NFC certificates that pay artists on every resale.</h1>
+            <p class="hero-lead">
+              Ona keeps cryptographic provenance out of the buyer's way. Collectors check out in NGN, USD, Base USDC, or Celo MiniPay cUSD without a seed phrase; each canvas or sculpture carries an NXP NTAG 424 DNA tamper seal bound to an ERC-721 + ERC-2981 certificate and a permanent Filecoin CIDv1 record.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#catalogue-workbench">Inspect Pilot Exhibition</a>
+              <a class="btn btn-secondary" href="#nfc-verifier">Simulate Physical NFC Tap</a>
+            </div>
+
+            <dl class="protocol-ledger-strip">
+              <div class="ledger-fact">
+                <dt>Contract Standards</dt>
+                <dd>ERC-721 · ERC-2981</dd>
+              </div>
+              <div class="ledger-fact">
+                <dt>Physical Security</dt>
+                <dd>NTAG 424 DNA SUN</dd>
+              </div>
+              <div class="ledger-fact">
+                <dt>Archival Registry</dt>
+                <dd>Filecoin CIDv1</dd>
+              </div>
+            </dl>
+          </div>
+
+          <aside class="hero-specimen" aria-label="Featured Pilot Specimen">
+            <div class="specimen-frame">
+              <img
+                id="hero-artwork-img"
+                src="assets/artworks/harmattan-linen.jpg"
+                alt="Harmattan Over Third Mainland — indigo and burnt sienna cold-wax impasto on Belgian linen"
+                width="800"
+                height="1000"
+              />
+            </div>
+            <div class="specimen-seal-bar">
+              <div>
+                <p class="specimen-meta-title" id="hero-artwork-title">Harmattan Over Third Mainland</p>
+                <p class="specimen-meta-artist" id="hero-artwork-sub">Adaeze Nwosu · Yaba, Lagos · 10.0% Resale Royalty</p>
+              </div>
+              <span class="status-pill verified" id="hero-artwork-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                NFC Seal Bound
+              </span>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Section 1: Pilot Catalogue + Walletless Checkout Workbench -->
+      <section class="section-block" id="catalogue-workbench">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <h2>Pilot Exhibition &amp; Walletless Collector Checkout</h2>
+              <p>
+                Select a physical piece from our West African pilot cohort to inspect its on-chain certificate parameters and test card, Celo MiniPay, or Base USDC escrow minting.
+              </p>
+            </div>
+          </div>
+
+          <div class="catalogue-rail" id="catalogue-rail" role="group" aria-label="Select pilot artwork"></div>
+
+          <div class="workbench-grid">
+            <article class="vellum-sheet" aria-live="polite">
+              <h3 id="detail-title">Harmattan Over Third Mainland</h3>
+              <p class="sheet-subtitle" id="detail-artist-line">Adaeze Nwosu — Yaba, Lagos, Nigeria (2026)</p>
+
+              <dl class="spec-dl">
+                <div>
+                  <dt>Medium</dt>
+                  <dd id="detail-medium"></dd>
+                </div>
+                <div>
+                  <dt>Dimensions &amp; Edition</dt>
+                  <dd id="detail-dimensions"></dd>
+                </div>
+                <div>
+                  <dt>ERC-2981 Artist Royalty</dt>
+                  <dd class="mono" id="detail-royalty"></dd>
+                </div>
+                <div>
+                  <dt>NTAG 424 DNA Chip UID</dt>
+                  <dd class="mono" id="detail-uid"></dd>
+                </div>
+                <div>
+                  <dt>Current Certificate Holder</dt>
+                  <dd class="mono" id="detail-holder"></dd>
+                </div>
+                <div>
+                  <dt>Filecoin / IPFS CIDv1</dt>
+                  <dd class="mono" id="detail-cid"></dd>
+                </div>
+              </dl>
+
+              <div class="btn-cluster">
+                <a
+                  class="btn btn-secondary"
+                  id="detail-json-link"
+                  href="metadata/ona_piece_001.json"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Raw CIDv1 Metadata JSON
+                </a>
+                <button type="button" class="btn btn-secondary" id="export-wallet-btn">
+                  Export Vault to Self-Custody
+                </button>
+              </div>
+              <div id="export-feedback" class="feedback-banner" hidden></div>
+            </article>
+
+            <div class="vellum-sheet">
+              <h3>Acquire Piece &amp; Lock Delivery Escrow</h3>
+              <p class="sheet-subtitle">
+                Primary funds remain in <code>OnaCertificate.sol</code> escrow until the physical NFC seal is tapped on delivery.
+              </p>
+
+              <div class="rail-switcher" role="tablist" aria-label="Payment settlement rail">
+                <button type="button" class="rail-tab" role="tab" data-rail="card" aria-selected="true">
+                  Card / Bank
+                  <span>Paystack · Stripe</span>
+                </button>
+                <button type="button" class="rail-tab" role="tab" data-rail="minipay" aria-selected="false">
+                  Celo MiniPay
+                  <span>cUSD Mobile</span>
+                </button>
+                <button type="button" class="rail-tab" role="tab" data-rail="base" aria-selected="false">
+                  Base L2
+                  <span>USDC Settlement</span>
+                </button>
+              </div>
+
+              <form id="checkout-form" novalidate>
+                <div class="field-group">
+                  <label for="buyer-email">Collector Email (Custodial Certificate Vault)</label>
+                  <input
+                    id="buyer-email"
+                    name="buyerEmail"
+                    type="email"
+                    class="field-input"
+                    value="collector.lagos@gallery.example"
+                    required
+                  />
+                  <p class="field-hint">
+                    Derived Account-Abstracted Vault: <code class="mono" id="derived-vault-preview">0x…</code>
+                  </p>
+                </div>
+
+                <div class="price-summary-bar">
+                  <span id="checkout-rail-label">Paystack / Stripe Card Settlement</span>
+                  <strong id="checkout-amount-display">$950.00</strong>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%">
+                  Complete Testnet Purchase &amp; Mint Escrow Certificate
+                </button>
+              </form>
+
+              <div id="checkout-feedback" class="feedback-banner" hidden></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: NTAG 424 DNA NFC Tap & Replay Protection -->
+      <section class="section-block" id="nfc-verifier">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <h2>NTAG 424 DNA Cryptographic NFC Seal &amp; Provenance Ledger</h2>
+              <p>
+                Unlike static QR codes that anyone can photograph, every physical tap increments a hardware-locked 24-bit counter and signs an HMAC/SUN challenge. Replaying a copied link reverts on-chain with <code>InvalidNFCCounter()</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="nfc-grid">
+            <div class="vellum-sheet">
+              <h3>Simulate Physical Tag Tap vs. Copied Link</h3>
+              <p class="sheet-subtitle">
+                Inspect live hardware counter telemetry for <strong id="nfc-piece-name">Harmattan Over Third Mainland</strong>.
+              </p>
+
+              <div class="telemetry-box" aria-live="polite">
+                <div class="telemetry-row">
+                  <span class="telemetry-key">Chip Hardware UID</span>
+                  <span id="tel-uid">04A28F19C36B80</span>
+                </div>
+                <div class="telemetry-row">
+                  <span class="telemetry-key">On-Chain Tag Hash</span>
+                  <span id="tel-hash">0x…</span>
+                </div>
+                <div class="telemetry-row">
+                  <span class="telemetry-key">Last Verified Counter</span>
+                  <span id="tel-counter">#14 (0x00000E)</span>
+                </div>
+                <div class="telemetry-row">
+                  <span class="telemetry-key">Latest SUN MAC</span>
+                  <span id="tel-mac">…</span>
+                </div>
+                <div class="telemetry-row">
+                  <span class="telemetry-key">Delivery Escrow State</span>
+                  <span id="tel-escrow">Verified &amp; Released</span>
+                </div>
+              </div>
+
+              <div class="btn-cluster">
+                <button type="button" class="btn btn-verified" id="simulate-tap-btn">
+                  Tap Physical NFC Seal (+1 Counter)
+                </button>
+                <button type="button" class="btn btn-ghost-danger" id="simulate-replay-btn">
+                  Test Copied URL Replay Attack
+                </button>
+              </div>
+
+              <div id="nfc-feedback" class="feedback-banner" hidden></div>
+            </div>
+
+            <div class="vellum-sheet">
+              <h3>Immutable Provenance Checkpoints</h3>
+              <p class="sheet-subtitle">
+                Every primary mint, physical NFC delivery confirmation, wallet export, and secondary resale recorded on-chain.
+              </p>
+              <ol class="provenance-list" id="provenance-timeline"></ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Secondary Market Resale & ERC-2981 Artist Royalties -->
+      <section class="section-block" id="resale-engine">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <h2>Secondary Resale &amp; Automatic Artist Royalty Settlement</h2>
+              <p>
+                When a work appreciates on the secondary market, <code>settleSecondaryResale()</code> splits proceeds atomically in a single transaction so emerging artists earn on every collector-to-collector transfer.
+              </p>
+            </div>
+          </div>
+
+          <div class="workbench-grid">
+            <div class="vellum-sheet">
+              <h3>Interactive Secondary Sale Split</h3>
+              <p class="sheet-subtitle">
+                Adjust the collector resale price for <strong id="resale-piece-title">Harmattan Over Third Mainland</strong> (Primary sale: <span class="mono" id="resale-primary-ref">$950</span>).
+              </p>
+
+              <div class="field-group">
+                <label for="resale-price-input">Secondary Market Sale Price (USD / USDC / cUSD)</label>
+                <input
+                  id="resale-price-input"
+                  type="number"
+                  min="100"
+                  max="250000"
+                  step="50"
+                  value="3400"
+                  class="field-input mono"
+                />
+              </div>
+
+              <div class="field-group">
+                <label for="resale-buyer-input">Incoming Collector Email or Wallet</label>
+                <input
+                  id="resale-buyer-input"
+                  type="text"
+                  value="collector.basel@kunsthalle.example"
+                  class="field-input"
+                />
+              </div>
+
+              <div class="split-meter" aria-hidden="true">
+                <div class="split-segment-artist" id="bar-artist" style="width: 10%"></div>
+                <div class="split-segment-seller" id="bar-seller" style="width: 85%"></div>
+                <div class="split-segment-fee" id="bar-fee" style="width: 5%"></div>
+              </div>
+
+              <div class="split-breakdown">
+                <div class="split-col">
+                  <span id="label-artist-bps">Original Artist (10.0%)</span>
+                  <strong id="val-artist-royalty">$340.00</strong>
+                </div>
+                <div class="split-col">
+                  <span>Selling Collector (85.0%)</span>
+                  <strong id="val-seller-net">$2,890.00</strong>
+                </div>
+                <div class="split-col">
+                  <span>Ona Protocol (5.0%)</span>
+                  <strong id="val-protocol-fee">$170.00</strong>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary" id="execute-resale-btn" style="width: 100%">
+                Settle Secondary Resale &amp; Pay Artist Royalty
+              </button>
+
+              <div id="resale-feedback" class="feedback-banner" hidden></div>
+            </div>
+
+            <div class="vellum-sheet">
+              <h3>On-Chain Standard &amp; Ecosystem Alignment</h3>
+              <p class="sheet-subtitle">
+                Compiled with <code>solc 0.8.26</code> — zero external dependencies, deterministic IPFS CIDv1 archival.
+              </p>
+              <dl class="spec-dl">
+                <div>
+                  <dt>Base L2 Track</dt>
+                  <dd>ERC-721 + ERC-2981 + USDC Escrow &amp; Smart Wallet</dd>
+                </div>
+                <div>
+                  <dt>Celo Mobile Track</dt>
+                  <dd>Opera MiniPay cUSD Checkout &amp; Phone NFC Tap</dd>
+                </div>
+                <div>
+                  <dt>Filecoin / IPFS Track</dt>
+                  <dd>Deterministic Raw SHA-256 CIDv1 Provenance Bundles</dd>
+                </div>
+                <div>
+                  <dt>Karma GAP Project UID</dt>
+                  <dd class="mono">0x2092b7cc…ca07a806</dd>
+                </div>
+              </dl>
+              <div class="btn-cluster">
+                <a
+                  class="btn btn-secondary"
+                  href="contracts/OnaCertificate.sol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Inspect OnaCertificate.sol
+                </a>
+                <a
+                  class="btn btn-secondary"
+                  href="https://gap.karmahq.xyz/project/ona-physical-art-provenance-nfc-certificate-engine"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Live Karma GAP Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Artist Studio Registration -->
+      <section class="section-block" id="artist-studio">
+        <div class="wrap">
+          <div class="section-head">
+            <div>
+              <h2>Artist Studio Registration &amp; Live CIDv1 Generator</h2>
+              <p>
+                Register a physical artwork to compute its content-addressed Filecoin/IPFS CIDv1 multihash in-browser via WebCrypto SHA-256 and bind a fresh NTAG 424 DNA tag into the pilot exhibition above.
+              </p>
+            </div>
+          </div>
+
+          <div class="vellum-sheet">
+            <form id="studio-mint-form">
+              <div class="studio-form-grid">
+                <div class="field-group">
+                  <label for="studio-title">Artwork Title</label>
+                  <input id="studio-title" type="text" class="field-input" value="Eko Lagoon Bronze Relief I" required />
+                </div>
+                <div class="field-group">
+                  <label for="studio-artist">Artist Name &amp; City</label>
+                  <input id="studio-artist" type="text" class="field-input" value="Chidinma Okafor · Surulere, Lagos" required />
+                </div>
+                <div class="field-group">
+                  <label for="studio-medium">Medium &amp; Support</label>
+                  <input id="studio-medium" type="text" class="field-input" value="Patina cast bronze &amp; hand-woven Aso-Oke textile mount" required />
+                </div>
+                <div class="field-group">
+                  <label for="studio-dimensions">Dimensions</label>
+                  <input id="studio-dimensions" type="text" class="field-input" value="95 × 70 cm" required />
+                </div>
+                <div class="field-group">
+                  <label for="studio-price">Primary Price (USD)</label>
+                  <input id="studio-price" type="number" min="50" max="100000" value="1200" class="field-input mono" required />
+                </div>
+                <div class="field-group">
+                  <label for="studio-royalty">Perpetual Resale Royalty (%)</label>
+                  <input id="studio-royalty" type="number" min="2" max="25" step="0.5" value="12.5" class="field-input mono" required />
+                </div>
+                <div class="span-2">
+                  <button type="submit" class="btn btn-primary">
+                    Compute Filecoin CIDv1 &amp; Bind NFC Certificate to Catalogue
+                  </button>
+                </div>
+              </div>
+            </form>
+            <div id="studio-feedback" class="feedback-banner" hidden></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <div>
+          <strong style="color: var(--ink)">Ona: Physical Art Provenance &amp; NFC Certificate Engine</strong>
+          <p style="margin: 6px 0 0">
+            Authored by Jethro Adebisi &amp; BlockPrint Contributors · Open-source MIT Protocol (Base · Celo MiniPay · Filecoin/IPFS). Pilot specimen visuals are exhibition studio renders for testnet demonstration.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="https://jethrotheuxpert.vercel.app/" target="_blank" rel="noopener noreferrer">Builder Portfolio</a>
+          <a href="https://github.com/adebisijethro/ona-art-provenance" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+          <a href="https://gap.karmahq.xyz/project/ona-physical-art-provenance-nfc-certificate-engine" target="_blank" rel="noopener noreferrer">Karma GAP Attestations</a>
+          <a href="metadata/provenance_registry.json" target="_blank" rel="noopener noreferrer">IPFS Provenance Registry</a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

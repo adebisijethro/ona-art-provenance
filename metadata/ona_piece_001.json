@@ -1,0 +1,94 @@
+{
+  "schema": "https://ona.blockprint.team/schemas/provenance-certificate-v1.json",
+  "name": "Harmattan Over Third Mainland — Ona Certificate #1",
+  "description": "Tamper-evident physical-to-digital certificate of authenticity for \"Harmattan Over Third Mainland\" (2026) by Adaeze Nwosu. Enforces 10.0% ERC-2981 secondary resale royalties across Base L2 and Celo MiniPay.",
+  "image": "assets/artworks/harmattan-linen.jpg",
+  "external_url": "https://adebisijethro.github.io/ona-art-provenance/?uid=04A28F19C36B80&ctr=00000E&mac=AE8955599DE4E53D",
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Adaeze Nwosu"
+    },
+    {
+      "trait_type": "Origin Studio",
+      "value": "Yaba, Lagos, Nigeria"
+    },
+    {
+      "trait_type": "Medium",
+      "value": "Natural indigo pigment, burnt sienna & cold-wax impasto on Belgian linen"
+    },
+    {
+      "trait_type": "Dimensions",
+      "value": "120 × 90 cm"
+    },
+    {
+      "trait_type": "Edition",
+      "value": "1 of 1"
+    },
+    {
+      "trait_type": "ERC-2981 Creator Royalty",
+      "value": "10.0%"
+    },
+    {
+      "trait_type": "NFC Hardware Chip",
+      "value": "NXP NTAG 424 DNA TamperTag"
+    },
+    {
+      "trait_type": "NFC Tag UID",
+      "value": "04A28F19C36B80"
+    }
+  ],
+  "provenance": {
+    "tokenId": 1,
+    "chainsSupported": [
+      "eip155:8453 (Base)",
+      "eip155:42220 (Celo MiniPay)"
+    ],
+    "artistRoyaltyReceiver": "0x4B91C87f2E0A19d3448b7E21c0A9175E83D04a11",
+    "royaltyBps": 1000,
+    "custodialBuyerVault": "0xb790de467fa27fa2b94b54675c360da175073ec2",
+    "tagHardwareHash": "0x49741b4605b667346eca2b49e202a7247f4d248e32aac7b3724003950b17c73e",
+    "lastVerifiedTapCounter": 14,
+    "primarySalePricing": {
+      "usdStripe": 950,
+      "ngnPaystack": 1520000,
+      "usdcBase": 950,
+      "cusdMiniPay": 950
+    },
+    "secondaryResaleSimulation": {
+      "grossSalePrice": 3400,
+      "royaltyBps": 1000,
+      "protocolFeeBps": 500,
+      "artistRoyalty": 340,
+      "protocolFee": 170,
+      "sellerProceeds": 2890
+    },
+    "checkpoints": [
+      {
+        "event": "ARTIST_STUDIO_REGISTRATION",
+        "actor": "0x4B91C87f2E0A19d3448b7E21c0A9175E83D04a11",
+        "timestamp": "2026-11-18T10:00:00Z"
+      },
+      {
+        "event": "CARD_CUSTODIAL_MINT_AND_ESCROW",
+        "actor": "0xb790de467fa27fa2b94b54675c360da175073ec2",
+        "amountUsd": 950,
+        "timestamp": "2026-11-20T14:30:00Z"
+      },
+      {
+        "event": "NFC_DELIVERY_TAP_VERIFIED",
+        "actor": "0xb790de467fa27fa2b94b54675c360da175073ec2",
+        "nfcCounter": 14,
+        "sunMac": "AE8955599DE4E53D",
+        "timestamp": "2026-11-22T11:15:00Z"
+      }
+    ]
+  },
+  "archival": {
+    "network": "Filecoin / IPFS Content-Addressed Bundle",
+    "cidV1": "bafkreiclojvhtcwdpezwmszqy2c4epo2pgkgedtu4beigsh4lqsxcoofnm",
+    "ipfsUri": "ipfs://bafkreiclojvhtcwdpezwmszqy2c4epo2pgkgedtu4beigsh4lqsxcoofnm",
+    "sha256Digest": "0x4b726a798ac37933664b30c685c23dda7994620e74e0488348fc5c257139c56b",
+    "byteLength": 2691
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "ona-art-provenance",
+  "version": "0.2.0",
+  "description": "Open-source physical-to-digital art provenance protocol, ERC-721 + ERC-2981 + NTAG 424 DNA NFC certificate engine, walletless card/MiniPay checkout, and Filecoin/IPFS CIDv1 archival.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jethro Adebisi <adebisireuel@gmail.com> (https://jethrotheuxpert.vercel.app/)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adebisijethro/ona-art-provenance.git"
+  },
+  "homepage": "https://adebisijethro.github.io/ona-art-provenance/",
+  "scripts": {
+    "compile": "node scripts/compile-contracts.mjs",
+    "bundle:ipfs": "node scripts/generate-provenance-bundles.mjs",
+    "test": "node scripts/verify-pipeline.mjs"
+  },
+  "keywords": [
+    "art-provenance",
+    "nfc",
+    "ntag-424-dna",
+    "erc-721",
+    "erc-2981",
+    "base",
+    "celo",
+    "minipay",
+    "filecoin",
+    "ipfs",
+    "rwa",
+    "creator-royalties"
+  ]
+}
