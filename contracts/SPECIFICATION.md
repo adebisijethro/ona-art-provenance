@@ -1,6 +1,6 @@
-# Ona Protocol Specification (v0.2)
+# Ona Protocol Specification (v0.3 — Security-Audited Release)
 
-**Milestone 1 Deliverable — UX Architecture, User Flows & Open NFC/ERC-721 Contract Standard**  
+**Milestone 1 & 2 Deliverable — UX Architecture, User Flows, Security Audit & Open NFC/ERC-721 Contract Standard**  
 **Author:** Jethro Adebisi ([Portfolio](https://jethrotheuxpert.vercel.app/) · [BlockPrint](https://blockprint.team))  
 **License:** MIT
 
@@ -48,21 +48,21 @@ Static QR codes and basic NDEF NFC tags (`NTAG213`) emit an unchanging URL, allo
 * **Provisioning at Studio:** Each tamper-loop tag holds a unique 7-byte UID (`tagUid`) and a hardware-locked 128-bit secret key. Ona records `tagHardwareHash = keccak256(tagUid || secretVerifier)` on-chain during `mintCertificate()`.
 * **Per-Tap Rolling Challenge:** Every physical phone tap increments a 24-bit hardware counter (`ctr`) inside the NFC silicon and appends a truncated MAC over `(tagUid || ctr)`:
   `https://adebisijethro.github.io/ona-art-provenance/?uid=04A28F19C36B80&ctr=00000F&mac=8E41C09B227AD104`
-* **On-Chain Replay Rejection:** `OnaCertificate.sol` stores `uint32 lastTapCounter` per `tokenId`. Any submission with `tapCounter <= art.lastTapCounter` reverts with `InvalidNFCCounter()`, guaranteeing that copied or bookmarked URLs cannot trigger delivery release or forge an inspection checkpoint.
+* **On-Chain EIP-191 ECDSA Signature Verification & Replay Rejection:** `OnaCertificate.sol` stores `uint32 lastTapCounter` per `tokenId` and verifies an EIP-191 ECDSA signature (`sunSignature`) from `nfcSunVerifier` over `keccak256(abi.encode(block.chainid, address(this), tokenId, tagHardwareHash, tapCounter, actor))` with EIP-2 `s <= secp256k1n/2` malleability protection. Zero static secrets ever appear in mempool calldata; cross-chain replays, mempool front-running, counter-inflation DoS, and stale copied URLs (`tapCounter <= art.lastTapCounter`) revert deterministically.
 
 ---
 
-## 4. Smart Contract Interface (`contracts/OnaCertificate.sol`)
+## 4. Smart Contract Interface (`contracts/OnaCertificate.sol` v0.3)
 
 | Function | Standard / Role | Behavior |
 | :--- | :--- | :--- |
 | `supportsInterface(bytes4)` | `ERC-165` | Advertises `ERC-721` (`0x80ac58cd`), `ERC-721Metadata` (`0x5b5e139f`), and `ERC-2981` (`0x2a55205a`). |
 | `royaltyInfo(uint256, uint256)` | `ERC-2981` | Returns `(artist, salePrice * royaltyBps / 10000)` up to `2500 bps` (25%). |
-| `mintCertificate(...)` | Relayer / Admin | Mints certificate to collector custodial vault or wallet, binds `tagHardwareHash`, pins `ipfs://bafkrei...`, and locks primary escrow. |
-| `confirmPhysicalDelivery(tokenId, preimage, tapCounter)` | Collector / Relayer | Validates `tapCounter > lastTapCounter` and hardware hash, sets `physicalVerified = true`, releases escrowed proceeds to artist, and appends `"NFC_DELIVERY_CONFIRMED"` checkpoint. |
-| `listForResale(tokenId, token, askPrice)` | Collector | Opens an on-chain secondary market ask in native currency, Base `USDC`, or Celo `cUSD`. |
-| `settleSecondaryResale(tokenId, newBuyer, tapCounter)` | Buyer | Atomically transfers `artistRoyalty` to original artist, `protocolFee` (5%) to treasury, and `sellerNet` to seller before transferring the ERC-721 token. |
-| `exportToSelfCustody(tokenId, externalWallet)` | Relayer | Moves certificate from email custodial vault to collector's self-custody wallet while preserving full `_provenanceHistory`. |
+| `mintCertificate(MintParams)` | Relayer / Admin | Mints certificate, enforces edition bounds, locks native or SafeERC20 primary escrow, and refunds any native overpayment (`nonReentrant`). |
+| `confirmPhysicalDelivery(tokenId, tapCounter, sunSignature)` | Collector / Relayer | Verifies EIP-191 ECDSA NFC SUN signature + monotonic `tapCounter > lastTapCounter`, sets `physicalVerified = true`, and releases escrowed funds to artist (`nonReentrant` + CEI). |
+| `listForResale` / `cancelResaleListing` | Collector | Opens or cancels an on-chain secondary market ask in native currency, Base `USDC`, or Celo `cUSD`. |
+| `settleSecondaryResale(...)` | Buyer | Atomically transfers `artistRoyalty` to original artist, `protocolFee` (5%) to treasury, and `sellerNet` to seller after updating ownership & history (`nonReentrant` + CEI). |
+| `exportToSelfCustody(tokenId, externalWallet)` | Relayer | One-way export from email custodial vault to collector's self-custody wallet; permanently locks out `custodialRelayer` and `admin` thereafter (`AlreadySelfCustodied`). |
 
 ---
 

@@ -25,13 +25,15 @@
 
 | Path | Description |
 | :--- | :--- |
-| [`contracts/OnaCertificate.sol`](contracts/OnaCertificate.sol) | Production Solidity (`^0.8.20`) smart contract implementing `ERC-721`, `ERC-2981`, NTAG 424 DNA monotonic counter replay protection, delivery escrow release, and enforced secondary resale splits. |
-| [`contracts/abi/OnaCertificate.json`](contracts/abi/OnaCertificate.json) | Compiled ABI, EVM bytecode (`12,665 bytes` runtime), and ERC-165/721/2981 method selectors (`solc 0.8.26`). |
-| [`contracts/SPECIFICATION.md`](contracts/SPECIFICATION.md) | Milestone 1 technical specification: end-to-end sequence flows, NTAG 424 DNA SUN cryptographic model, and multi-chain standard mapping (Base, Celo, Filecoin, Tezos, Cardano, Flow). |
+| [`contracts/OnaCertificate.sol`](contracts/OnaCertificate.sol) | Audited Solidity (`^0.8.20`) smart contract (`v0.3`) implementing `ERC-721`, `ERC-2981`, EIP-191 ECDSA NTAG 424 DNA SUN signature verification, strict self-custody lockout, `nonReentrant` + CEI protection, native overpayment refunds, and `SafeERC20` secondary resale splits. |
+| [`contracts/abi/OnaCertificate.json`](contracts/abi/OnaCertificate.json) | Compiled ABI, EVM bytecode (`15,507 bytes` runtime), and ERC-165/721/2981 method selectors (`solc 0.8.26`). |
+| [`contracts/mocks/TestContracts.sol`](contracts/mocks/TestContracts.sol) | Testnet fork & security harnesses: `MockERC20` (`USDC`), `MockNonStandardERC20` (legacy zero-return `USDT`), `MaliciousReentrantParticipant`, and `ERC721Receiver` mocks. |
+| [`contracts/SPECIFICATION.md`](contracts/SPECIFICATION.md) | Technical specification: end-to-end sequence flows, EIP-191 NTAG 424 DNA SUN cryptographic model, and multi-chain standard mapping. |
 | [`sdk/ona-protocol.mjs`](sdk/ona-protocol.mjs) | Zero-dependency ES module SDK for RFC 4648 CIDv1 computation, NTAG 424 DNA SUN tap signing/verification, email custodial vault derivation, and ERC-2981 split calculation. |
 | [`metadata/`](metadata/) | Generated pilot exhibition provenance bundles (`ona_piece_001.json` – `ona_piece_003.json`) and master [`provenance_registry.json`](metadata/provenance_registry.json). |
 | [`index.html`](index.html) / [`app.js`](app.js) / [`styles.css`](styles.css) | Interactive web workbench: Walletless Card / MiniPay / Base checkout, live NFC tap & replay-attack verifier, secondary resale royalty split simulator, and in-browser CIDv1 studio registration. |
-| [`scripts/verify-pipeline.mjs`](scripts/verify-pipeline.mjs) | Automated verification test suite covering ABI selectors, CIDv1 determinism, NFC replay rejection, and royalty distribution math. |
+| [`scripts/test-evm-and-testnet.mjs`](scripts/test-evm-and-testnet.mjs) | Full Hardhat EVM fork of live **Base Sepolia (`84532`)** + live remote RPC execution against **Base Sepolia (`84532`)** and **Celo Sepolia (`11142220`)** covering all 10 functional, ERC-20, self-custody, and reentrancy exploit tests. |
+| [`scripts/deploy-testnet.mjs`](scripts/deploy-testnet.mjs) | One-command deployment script for Base Sepolia (`npm run deploy:base-sepolia`) and Celo Sepolia (`npm run deploy:celo-sepolia`). |
 
 ---
 

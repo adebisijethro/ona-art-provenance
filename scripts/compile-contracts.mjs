@@ -23,13 +23,19 @@ function loadSolc() {
 }
 
 const solc = loadSolc();
-const contractPath = path.join(rootDir, 'contracts', 'OnaCertificate.sol');
-const source = fs.readFileSync(contractPath, 'utf8');
+const mainContractSource = fs.readFileSync(
+  path.join(rootDir, 'contracts', 'OnaCertificate.sol'),
+  'utf8'
+);
+const testMocksSource = fs
+  .readFileSync(path.join(rootDir, 'contracts', 'mocks', 'TestContracts.sol'), 'utf8')
+  .replace('import "../OnaCertificate.sol";', 'import "OnaCertificate.sol";');
 
 const input = {
   language: 'Solidity',
   sources: {
-    'OnaCertificate.sol': { content: source },
+    'OnaCertificate.sol': { content: mainContractSource },
+    'TestContracts.sol': { content: testMocksSource },
   },
   settings: {
     optimizer: { enabled: true, runs: 200 },
@@ -54,28 +60,53 @@ if (compiled.errors) {
   }
 }
 
-const target = compiled.contracts['OnaCertificate.sol']['OnaCertificate'];
 const outDir = path.join(rootDir, 'contracts', 'abi');
 fs.mkdirSync(outDir, { recursive: true });
 
+const target = compiled.contracts['OnaCertificate.sol']['OnaCertificate'];
 const artifact = {
   contractName: 'OnaCertificate',
+  version: '0.3.0',
   compilerVersion: solc.version(),
-  standards: ['ERC-165', 'ERC-721', 'ERC-721Metadata', 'ERC-2981'],
+  standards: ['ERC-165', 'ERC-721', 'ERC-721Metadata', 'ERC-2981', 'EIP-191-NFC-SUN'],
   supportedChains: [
     { name: 'Base Mainnet', chainId: 8453 },
     { name: 'Base Sepolia', chainId: 84532 },
     { name: 'Celo Mainnet (MiniPay)', chainId: 42220 },
-    { name: 'Celo Alfajores', chainId: 44787 },
+    { name: 'Celo Sepolia', chainId: 11142220 },
   ],
   abi: target.abi,
   methodIdentifiers: target.evm.methodIdentifiers,
   bytecode: `0x${target.evm.bytecode.object}`,
+  deployedBytecode: `0x${target.evm.deployedBytecode.object}`,
   deployedBytecodeSize: target.evm.deployedBytecode.object.length / 2,
 };
 
-const outPath = path.join(outDir, 'OnaCertificate.json');
-fs.writeFileSync(outPath, JSON.stringify(artifact, null, 2) + '\n');
+fs.writeFileSync(
+  path.join(outDir, 'OnaCertificate.json'),
+  JSON.stringify(artifact, null, 2) + '\n'
+);
+
+const mockNames = [
+  'MockERC20',
+  'MockNonStandardERC20',
+  'MaliciousReentrantParticipant',
+  'MockERC721Receiver',
+  'RejectingERC721Receiver',
+];
+const mocksOut = {};
+for (const name of mockNames) {
+  const c = compiled.contracts['TestContracts.sol'][name];
+  mocksOut[name] = {
+    abi: c.abi,
+    bytecode: `0x${c.evm.bytecode.object}`,
+  };
+}
+fs.writeFileSync(
+  path.join(outDir, 'TestContracts.json'),
+  JSON.stringify(mocksOut, null, 2) + '\n'
+);
+
 console.log(
-  `Compiled OnaCertificate.sol successfully with solc ${solc.version()} -> contracts/abi/OnaCertificate.json (${artifact.deployedBytecodeSize} bytes runtime bytecode)`
+  `Compiled OnaCertificate.sol v0.3 + 5 test harnesses cleanly with solc ${solc.version()} (${artifact.deployedBytecodeSize} bytes runtime bytecode, 0 errors)`
 );

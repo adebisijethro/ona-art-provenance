@@ -34,12 +34,16 @@ assert.equal(
   'ERC-721 ownerOf selector must match 0x6352211e'
 );
 assert.ok(
-  artifact.methodIdentifiers['confirmPhysicalDelivery(uint256,bytes32,uint32)'],
-  'NFC physical delivery escrow confirmation method must exist'
+  artifact.methodIdentifiers['confirmPhysicalDelivery(uint256,uint32,bytes)'],
+  'EIP-191 ECDSA NFC physical delivery escrow confirmation method must exist'
 );
 assert.ok(
-  artifact.methodIdentifiers['settleSecondaryResale(uint256,address,uint32)'],
+  artifact.methodIdentifiers['settleSecondaryResale(uint256,address,bool,uint32,bytes)'],
   'Enforced secondary resale settlement method must exist'
+);
+assert.ok(
+  artifact.methodIdentifiers['cancelResaleListing(uint256)'],
+  'Resale listing cancellation method must exist'
 );
 console.log('✓ [1/5] Solidity ERC-721 + ERC-2981 + NFC Escrow contract ABI & selectors verified');
 
